@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+<!--title-->
+{% block title %} Coder's Blog - Contact {% endblock title %}
+<!--navbar active class-->
+{% block contactactive %} active {% endblock contactactive %}
+<!--body-->
+{% block body %}
+    <section class="pt-4 pb-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-10 m-auto">
+                    <form action="/contact" method="POST"> {% csrf_token %} 
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input type="text" class="form-control" id="name" name="name">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email address</label>
+                            <input type="email" class="form-control" id="email" name="email">
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" class="form-control" id="phone" name="phone">
+                        </div>
+                        <div class="form-group">
+                            <label for="msg">Describe your issue below: </label>
+                            <textarea class="form-control" name="msg" id="msg" cols="30" rows="5"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-success">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock body %}

@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+<!--title-->
+{% block title %} Blog - Post {% endblock title %}
+<!--navbar active class-->
+{% block blogactive %} active {% endblock blogactive %}
+<!-- custom css -->
+{% block css %}
+<style>
+    .comment_section{
+        border-radius: 5px;
+        box-shadow: 0 0 3px green;
+    }
+    .user_icon{
+        border-radius: 10px;
+        font-size: 30px;
+        height: 50px;
+        line-height: 50px;
+        text-align: center;
+        width: 50px;
+        border: 2px solid #000;
+        margin-top: 12px;
+    }
+    .reply .user_icon{
+        font-size: 20px;
+        height: 35px;
+        line-height: 35px;
+        text-align: center;
+        width: 35px;
+    }
+    .username{
+        font-size:20px;
+        text-transform: capitalize;
+    }
+    .reply .username{font-size:17px;}
+    mark.mark{
+        border-radius:3px;
+        color:#fff;
+    }
+    .reply mark.mark{font-size:12px;}
+    .reply .comment_section{
+        border-radius:0;
+        background: #eee;
+    }
+</style>
+{% endblock css %}
+<!-- load humanize module -->
+{% load humanize %}
+<!-- load user defined template tag or filter -->
+{% load extras %}
+<!--body-->
+{% block body %}
+<section class="pb-4 pt-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-9 m-auto">
+                <div class="blog-post">
+                    <h2 class="blog-post-title">{{post.title}}</h2>
+                    <p class="blog-post-meta">
+                        {{post.timeStamp | naturaltime}} 
+                        <b>By - 
+                            <a href="/about" class="text-success">
+                                {{post.author}}
+                            </a>
+                        </b>
+                        <span>({{post.views}} views)</span>
+                    </p>
+                    <p>{{post.content|safe}}</p> <!-- safe filter is used to escape html entities into html outpu -->
+                    <hr class="bg-success">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-9 m-auto">
+                <h2>Comments({{comments.count}})</h2>
+                <!-- comment form -->
+                {% if user.is_authenticated %}
+                    <form action="/blog/postComment" method='POST'>{% csrf_token %}
+                        <div class="form-group">
+                            <label for="comment">Post comment</label>
+                            <input type="text" class="form-control" id="comment" name="comment" placeholder="Enter Your Comment" autocomplete="off">
+                        </div>
+                        <input type="hidden" name="postSno" value="{{post.sno}}">
+                        <input type="hidden" name="parentSno" value="">
+                        <button type="submit" class="btn btn-success">Submit</button>
+                    </form>
+                {% else %}
+                    <mark class="mark bg-danger d-block">Please login to post comment</mark>
+                {% endif %}
+                {% for comment in comments %}
+                    <div class="row mb-3 mt-3 mx-auto comment_section">
+                        <div class="col-md-1">
+                            <i class="fa fa-users user_icon"></i>
+                        </div>
+                        <div class="col-md-11 py-2">
+                            <b class="username">{{comment.user.username}}</b> <mark class="mark bg-success">{{comment.timeStamp | naturaltime}}</mark>
+                            <div class="mb-3 mt-1">
+                                {{ comment.comment }}
+                            </div>
+                            <div class="reply">
+                                {% if user.is_authenticated %}
+                                <button class="btn btn-sm btn-success" type="button" data-toggle="collapse" data-target="#reply{{comment.sno}}" aria-expanded="false" aria-controls="reply{{comment.sno}}">Reply</button>
+                                <div class="collapse" id="reply{{comment.sno}}">
+                                    <div class="card card-body mt-2">
+                                       <form action="/blog/postComment" method='POST'>{% csrf_token %}
+                                            <div class="form-group">
+                                                <label for="comment">Post a Reply</label>
+                                                <input type="text" class="form-control" id="comment" name="comment" placeholder="Enter Your Reply" autocomplete="off">                             
+                                                <input type="hidden" name="parentSno" value="{{comment.sno}}">
+                                            </div>
+                                            <input type="hidden" name="postSno" value="{{post.sno}}">
+                                            <button type="submit" class="btn btn-sm btn-success">Submit</button>
+                                        </form> 
+                                    </div>
+                                </div>
+                                {% else %}
+                                <button class="btn btn-sm btn-success" type="button" data-toggle="collapse" data-target="#reply{{comment.sno}}" aria-expanded="false" aria-controls="reply{{comment.sno}}" disabled>Login To Reply</button>
+                                {% endif %}
+                                <div class="replies mt-3">
+                                    {% for reply in repDict|get_val:comment.sno %}
+                                        <div class="row mb-3 mt-3 mx-auto comment_section">
+                                            <div class="col-md-1">
+                                                <i class="fa fa-user user_icon"></i>
+                                            </div>
+                                            <div class="col-md-11 py-2">
+                                                <b class="username">{{reply.user.username}}</b> <mark class="mark bg-success">{{reply.timeStamp | naturaltime}}</mark>
+                                                <div class="mt-1">
+                                                    {{reply.comment}}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock body %}

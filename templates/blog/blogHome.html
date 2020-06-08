@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+<!--title-->
+{% block title %} Blog - Home {% endblock title %}
+<!--navbar active class-->
+{% block blogactive %} active {% endblock blogactive %}
+<!-- load humanize module -->
+{% load humanize %}
+<!--body-->
+{% block body %}
+    <section class="pt-4 pb-4">
+        <div class="container">
+            <h2 class="mb-3">Programming Articles By Coder's Blog: </h2>
+            {% for post in allPosts %}
+                <div class="row no-gutters border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+                    <div class="col p-4 d-flex flex-column position-static">
+                        <strong class="d-inline-block mb-2 text-success">{{post.author}} (views : {{post.views}})</strong>
+                        <h3 class="mb-1">{{post.title}}</h3>
+                        <div class="mb-1 text-muted">{{post.timeStamp | naturaltime}}</div>
+                        <p class="card-text mb-2">{{post.content|safe|truncatechars_html:80}}</p>
+                        <div>
+                            <a href="/blog/{{post.slug}}" role="button" class="btn btn-success">Continue reading</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+{% endblock body %}
